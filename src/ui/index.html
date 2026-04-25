@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Biblioteca Universitaria</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #161921;
+      --surface2: #1e2230;
+      --border: #2a2f42;
+      --accent: #4f7cff;
+      --accent2: #ff6b6b;
+      --accent3: #43e97b;
+      --text: #e8eaf0;
+      --text-muted: #6b7280;
+      --font-head: 'Syne', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-head);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: rgba(13,15,20,0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+    }
+    .logo span { color: var(--text); }
+    .badge {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      color: var(--text-muted);
+    }
+
+    /* LAYOUT */
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr 300px;
+      height: calc(100vh - 57px);
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      overflow-y: auto;
+    }
+    .sidebar-label {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.5rem 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-head);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+      width: 100%;
+    }
+    .nav-btn:hover { background: var(--surface2); color: var(--text); }
+    .nav-btn.active { background: var(--accent); color: #fff; }
+    .nav-btn .icon { font-size: 1rem; }
+
+    /* MAIN */
+    main {
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.3rem;
+    }
+    .section-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      margin-bottom: 1.8rem;
+    }
+
+    /* CARDS GRID */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card-label {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+    .card-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--accent);
+    }
+    .card-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem; }
+    .card-accent2 .card-value { color: var(--accent2); }
+    .card-accent3 .card-value { color: var(--accent3); }
+
+    /* FORMS */
+    .form-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .form-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .form-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; flex: 1; min-width: 140px; }
+    label { font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    input, select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.55rem 0.85rem;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface2); }
+
+    .btn {
+      padding: 0.6rem 1.4rem;
+      border-radius: 8px;
+      border: none;
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #3a6ae8; transform: translateY(-1px); }
+    .btn-danger { background: var(--accent2); color: #fff; }
+    .btn-danger:hover { opacity: 0.85; }
+    .btn-success { background: var(--accent3); color: #0d0f14; }
+    .btn-success:hover { opacity: 0.85; }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    thead { background: var(--surface2); }
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+
+    .tag {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      font-weight: 500;
+    }
+    .tag-green { background: rgba(67,233,123,0.15); color: var(--accent3); }
+    .tag-red { background: rgba(255,107,107,0.15); color: var(--accent2); }
+    .tag-blue { background: rgba(79,124,255,0.15); color: var(--accent); }
+
+    /* MULTA CALC */
+    .multa-result {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      display: none;
+    }
+    .multa-result.show { display: block; }
+    .multa-amount {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent2);
+      font-family: var(--font-head);
+      letter-spacing: -0.04em;
+    }
+    .multa-detail { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+    /* LOG PANEL */
+    .log-panel {
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .log-header {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .log-clear {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .log-clear:hover { border-color: var(--accent2); color: var(--accent2); }
+    .log-entries {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .log-entry {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.73rem;
+      border-left: 3px solid var(--border);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .log-entry.success { border-left-color: var(--accent3); }
+    .log-entry.error { border-left-color: var(--accent2); }
+    .log-entry.info { border-left-color: var(--accent); }
+    .log-time { color: var(--text-muted); font-size: 0.65rem; margin-bottom: 0.15rem; }
+    .log-msg { color: var(--text); }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+
+    .sep { height: 1px; background: var(--border); margin: 1.5rem 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Biblioteca<span>UNI</span></div>
+  <div class="badge">Sistema de Gestión · TP 1.1 · POO</div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-label">Menú</div>
+    <button class="nav-btn active" onclick="showSection('dashboard', this)">
+      <span class="icon">📊</span> Dashboard
+    </button>
+    <button class="nav-btn" onclick="showSection('libros', this)">
+      <span class="icon">📚</span> Libros
+    </button>
+    <button class="nav-btn" onclick="showSection('estudiantes', this)">
+      <span class="icon">🎓</span> Estudiantes
+    </button>
+    <button class="nav-btn" onclick="showSection('prestamos', this)">
+      <span class="icon">🔄</span> Préstamos
+    </button>
+    <button class="nav-btn" onclick="showSection('multas', this)">
+      <span class="icon">💰</span> Multas
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="sec-dashboard">
+      <div class="section-title">Dashboard</div>
+      <div class="section-sub">// Estado general del sistema</div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-label">Total Libros</div>
+          <div class="card-value" id="stat-libros">0</div>
+          <div class="card-desc">en el catálogo</div>
+        </div>
+        <div class="card card-accent3">
+          <div class="card-label">Disponibles</div>
+          <div class="card-value" id="stat-disponibles">0</div>
+          <div class="card-desc">para préstamo</div>
+        </div>
+        <div class="card card-accent2">
+          <div class="card-label">Prestados</div>
+          <div class="card-value" id="stat-prestados">0</div>
+          <div class="card-desc">actualmente</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Estudiantes</div>
+          <div class="card-value" id="stat-estudiantes">0</div>
+          <div class="card-desc">registrados</div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+      <div class="section-sub">// Catálogo de libros registrados</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ISBN</th><th>Título</th><th>Autor</th><th>Año</th><th>Estado</th></tr></thead>
+          <tbody id="dash-libros-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LIBROS -->
+    <div class="section" id="sec-libros">
+      <div class="section-title">Libros</div>
+      <div class="section-sub">// Agregar libros al catálogo</div>
+
+      <div class="form-block">
+        <div class="form-title">📖 Nuevo Libro</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>ISBN</label>
+            <input type="text" id="l-isbn" placeholder="ej: 978-3-16"/>
+          </div>
+          <div class="form-group">
+            <label>Título</label>
+            <input type="text" id="l-titulo" placeholder="ej: Java Avanzado"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Autor</label>
+            <input type="text" id="l-autor" placeholder="ej: James Gosling"/>
+          </div>
+          <div class="form-group">
+            <label>Año</label>
+            <input type="number" id="l-anio" placeholder="ej: 2023" min="1900" max="2099"/>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="agregarLibro()">+ Agregar Libro</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ISBN</th><th>Título</th><th>Autor</th><th>Año</th><th>Estado</th></tr></thead>
+          <tbody id="libros-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ESTUDIANTES -->
+    <div class="section" id="sec-estudiantes">
+      <div class="section-title">Estudiantes</div>
+      <div class="section-sub">// Registrar estudiantes en el sistema</div>
+
+      <div class="form-block">
+        <div class="form-title">🎓 Nuevo Estudiante</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Legajo</label>
+            <input type="text" id="e-legajo" placeholder="ej: 12345"/>
+          </div>
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="e-nombre" placeholder="ej: Juan Pérez"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Carrera</label>
+            <input type="text" id="e-carrera" placeholder="ej: Ingeniería en Sistemas"/>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="e-email" placeholder="ej: juan@uni.edu"/>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="agregarEstudiante()">+ Registrar Estudiante</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Legajo</th><th>Nombre</th><th>Carrera</th><th>Email</th><th>Préstamos</th></tr></thead>
+          <tbody id="estudiantes-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRÉSTAMOS -->
+    <div class="section" id="sec-prestamos">
+      <div class="section-title">Préstamos</div>
+      <div class="section-sub">// Gestionar préstamos y devoluciones</div>
+
+      <div class="form-block">
+        <div class="form-title">🔄 Nuevo Préstamo</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Estudiante</label>
+            <select id="p-estudiante"><option value="">— Seleccionar —</option></select>
+          </div>
+          <div class="form-group">
+            <label>Libro</label>
+            <select id="p-libro"><option value="">— Seleccionar —</option></select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="realizarPrestamo()">Realizar Préstamo</button>
+      </div>
+
+      <div class="section-sub">// Préstamos activos</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Libro</th><th>Estudiante</th><th>Fecha</th><th>Acción</th></tr></thead>
+          <tbody id="prestamos-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MULTAS -->
+    <div class="section" id="sec-multas">
+      <div class="section-title">Calculadora de Multas</div>
+      <div class="section-sub">// calcularMulta(dias, valor) — algoritmo recursivo</div>
+
+      <div class="form-block">
+        <div class="form-title">💰 Calcular Multa por Retraso</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Días de retraso</label>
+            <input type="number" id="m-dias" placeholder="ej: 15" min="1" max="60"/>
+          </div>
+          <div class="form-group">
+            <label>Valor del libro ($)</label>
+            <input type="number" id="m-valor" placeholder="ej: 1000" min="0"/>
+          </div>
+        </div>
+        <button class="btn btn-danger" onclick="calcularMulta()">Calcular Multa</button>
+
+        <div class="multa-result" id="multa-result">
+          <div class="multa-detail">Multa calculada (1% por día, máx 30 días)</div>
+          <div class="multa-amount" id="multa-amount">$0.00</div>
+          <div class="multa-detail" id="multa-detail"></div>
+        </div>
+      </div>
+
+      <div class="form-block">
+        <div class="form-title" style="font-size:0.85rem; color: var(--text-muted);">Implementación Java (BibliotecaService)</div>
+        <pre style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent3); line-height: 1.7; background: var(--surface2); padding: 1rem; border-radius: 8px; overflow-x: auto;">public double calcularMulta(int dias, double valor) {
+    if (dias &lt;= 0) return 0;
+    if (dias &gt; 30) dias = 30;
+    return valor * 0.01 + calcularMulta(dias - 1, valor);
+}</pre>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- LOG PANEL -->
+  <div class="log-panel">
+    <div class="log-header">
+      <span>📋 Consola del sistema</span>
+      <button class="log-clear" onclick="clearLog()">limpiar</button>
+    </div>
+    <div class="log-entries" id="log-entries">
+      <div class="log-entry info">
+        <div class="log-time">sistema</div>
+        <div class="log-msg">Iniciando sistema de biblioteca...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── STATE ──────────────────────────────────────────────────
+  const state = {
+    libros: [
+      { isbn: "1", titulo: "Java", autor: "autor1", anio: 2020, disponible: true },
+      { isbn: "2", titulo: "Python", autor: "autor2", anio: 2020, disponible: true },
+      { isbn: "3", titulo: "C++", autor: "autor3", anio: 2020, disponible: true },
+      { isbn: "4", titulo: "POO", autor: "autor4", anio: 2020, disponible: true },
+      { isbn: "5", titulo: "SQL", autor: "autor5", anio: 2020, disponible: true },
+    ],
+    estudiantes: [
+      { legajo: "100", nombre: "Juan", carrera: "Sistemas", email: "juan@uni.edu" },
+      { legajo: "101", nombre: "Ana", carrera: "Sistemas", email: "ana@uni.edu" },
+      { legajo: "102", nombre: "Luis", carrera: "Sistemas", email: "luis@uni.edu" },
+    ],
+    prestamos: [],
+  };
+
+  // ── LOG ────────────────────────────────────────────────────
+  function log(msg, type = "info") {
+    const el = document.getElementById("log-entries");
+    const entry = document.createElement("div");
+    entry.className = `log-entry ${type}`;
+    const now = new Date();
+    const time = now.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    entry.innerHTML = `<div class="log-time">${time}</div><div class="log-msg">${msg}</div>`;
+    el.appendChild(entry);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function clearLog() {
+    document.getElementById("log-entries").innerHTML = "";
+    log("Consola limpiada.", "info");
+  }
+
+  // ── NAV ────────────────────────────────────────────────────
+  function showSection(id, btn) {
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById("sec-" + id).classList.add("active");
+    btn.classList.add("active");
+    if (id === "dashboard") renderDashboard();
+    if (id === "libros") renderLibros();
+    if (id === "estudiantes") renderEstudiantes();
+    if (id === "prestamos") renderPrestamos();
+  }
+
+  // ── RENDER HELPERS ────────────────────────────────────────
+  function estadoBadge(disponible) {
+    return disponible
+      ? `<span class="tag tag-green">disponible</span>`
+      : `<span class="tag tag-red">prestado</span>`;
+  }
+
+  function renderDashboard() {
+    const disponibles = state.libros.filter(l => l.disponible).length;
+    const prestados = state.libros.length - disponibles;
+    document.getElementById("stat-libros").textContent = state.libros.length;
+    document.getElementById("stat-disponibles").textContent = disponibles;
+    document.getElementById("stat-prestados").textContent = prestados;
+    document.getElementById("stat-estudiantes").textContent = state.estudiantes.length;
+
+    const body = document.getElementById("dash-libros-body");
+    if (state.libros.length === 0) {
+      body.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div>Sin libros registrados</div></td></tr>`;
+      return;
+    }
+    body.innerHTML = state.libros.map(l =>
+      `<tr><td><span class="tag tag-blue">${l.isbn}</span></td><td>${l.titulo}</td><td>${l.autor}</td><td>${l.anio}</td><td>${estadoBadge(l.disponible)}</td></tr>`
+    ).join("");
+  }
+
+  function renderLibros() {
+    const body = document.getElementById("libros-body");
+    if (state.libros.length === 0) {
+      body.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div>Sin libros</div></td></tr>`;
+      return;
+    }
+    body.innerHTML = state.libros.map(l =>
+      `<tr><td><span class="tag tag-blue">${l.isbn}</span></td><td>${l.titulo}</td><td>${l.autor}</td><td>${l.anio}</td><td>${estadoBadge(l.disponible)}</td></tr>`
+    ).join("");
+  }
+
+  function renderEstudiantes() {
+    const body = document.getElementById("estudiantes-body");
+    if (state.estudiantes.length === 0) {
+      body.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🎓</div>Sin estudiantes</div></td></tr>`;
+      return;
+    }
+    body.innerHTML = state.estudiantes.map(e => {
+      const count = state.prestamos.filter(p => p.legajo === e.legajo).length;
+      const badge = count >= 3
+        ? `<span class="tag tag-red">${count}/3 — límite</span>`
+        : `<span class="tag tag-green">${count}/3</span>`;
+      return `<tr><td>${e.legajo}</td><td>${e.nombre}</td><td>${e.carrera}</td><td>${e.email}</td><td>${badge}</td></tr>`;
+    }).join("");
+  }
+
+  function renderPrestamos() {
+    // Rebuild selects
+    const selEst = document.getElementById("p-estudiante");
+    const selLib = document.getElementById("p-libro");
+    selEst.innerHTML = `<option value="">— Seleccionar estudiante —</option>` +
+      state.estudiantes.map(e => `<option value="${e.legajo}">${e.nombre} (${e.legajo})</option>`).join("");
+    selLib.innerHTML = `<option value="">— Seleccionar libro —</option>` +
+      state.libros.filter(l => l.disponible).map(l => `<option value="${l.isbn}">${l.titulo} [${l.isbn}]</option>`).join("");
+
+    const body = document.getElementById("prestamos-body");
+    if (state.prestamos.length === 0) {
+      body.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">🔄</div>Sin préstamos activos</div></td></tr>`;
+      return;
+    }
+    body.innerHTML = state.prestamos.map((p, i) => {
+      const libro = state.libros.find(l => l.isbn === p.isbn);
+      const est = state.estudiantes.find(e => e.legajo === p.legajo);
+      return `<tr>
+        <td>${libro ? libro.titulo : p.isbn}</td>
+        <td>${est ? est.nombre : p.legajo}</td>
+        <td><span class="tag tag-blue">${p.fecha}</span></td>
+        <td><button class="btn btn-success" style="padding:0.3rem 0.8rem;font-size:0.75rem;" onclick="devolver(${i})">Devolver</button></td>
+      </tr>`;
+    }).join("");
+  }
+
+  // ── ACTIONS ───────────────────────────────────────────────
+  function agregarLibro() {
+    const isbn = document.getElementById("l-isbn").value.trim();
+    const titulo = document.getElementById("l-titulo").value.trim();
+    const autor = document.getElementById("l-autor").value.trim();
+    const anio = parseInt(document.getElementById("l-anio").value);
+
+    if (!isbn || !titulo || !autor || !anio) {
+      log("❌ Error: todos los campos son obligatorios.", "error"); return;
+    }
+    if (state.libros.find(l => l.isbn === isbn)) {
+      log(`❌ LibroNoDisponibleException: ISBN ${isbn} ya existe.`, "error"); return;
+    }
+    state.libros.push({ isbn, titulo, autor, anio, disponible: true });
+    ["l-isbn","l-titulo","l-autor","l-anio"].forEach(id => document.getElementById(id).value = "");
+    renderLibros();
+    log(`✅ Libro agregado: "${titulo}" (ISBN: ${isbn})`, "success");
+  }
+
+  function agregarEstudiante() {
+    const legajo = document.getElementById("e-legajo").value.trim();
+    const nombre = document.getElementById("e-nombre").value.trim();
+    const carrera = document.getElementById("e-carrera").value.trim();
+    const email = document.getElementById("e-email").value.trim();
+
+    if (!legajo || !nombre || !carrera || !email) {
+      log("❌ Error: todos los campos son obligatorios.", "error"); return;
+    }
+    if (state.estudiantes.find(e => e.legajo === legajo)) {
+      log(`❌ Error: ya existe un estudiante con legajo ${legajo}.`, "error"); return;
+    }
+    state.estudiantes.push({ legajo, nombre, carrera, email });
+    ["e-legajo","e-nombre","e-carrera","e-email"].forEach(id => document.getElementById(id).value = "");
+    renderEstudiantes();
+    log(`✅ Estudiante registrado: ${nombre} (Legajo: ${legajo})`, "success");
+  }
+
+  function realizarPrestamo() {
+    const legajo = document.getElementById("p-estudiante").value;
+    const isbn = document.getElementById("p-libro").value;
+
+    if (!legajo) { log("❌ EstudianteNoEncontradoException: seleccioná un estudiante.", "error"); return; }
+    if (!isbn) { log("❌ LibroNoDisponibleException: seleccioná un libro.", "error"); return; }
+
+    const est = state.estudiantes.find(e => e.legajo === legajo);
+    if (!est) { log(`❌ EstudianteNoEncontradoException: legajo ${legajo} no encontrado.`, "error"); return; }
+
+    const count = state.prestamos.filter(p => p.legajo === legajo).length;
+    if (count >= 3) {
+      log(`❌ LimitePrestamosExcedidoException: ${est.nombre} ya tiene 3 préstamos activos.`, "error"); return;
+    }
+
+    const libro = state.libros.find(l => l.isbn === isbn);
+    if (!libro || !libro.disponible) {
+      log(`❌ LibroNoDisponibleException: el libro no está disponible.`, "error"); return;
+    }
+
+    libro.disponible = false;
+    const fecha = new Date().toLocaleDateString("es-AR");
+    state.prestamos.push({ isbn, legajo, fecha });
+    renderPrestamos();
+    log(`✅ Préstamo realizado: "${libro.titulo}" → ${est.nombre}`, "success");
+  }
+
+  function devolver(index) {
+    const p = state.prestamos[index];
+    const libro = state.libros.find(l => l.isbn === p.isbn);
+    const est = state.estudiantes.find(e => e.legajo === p.legajo);
+    libro.disponible = true;
+    state.prestamos.splice(index, 1);
+    renderPrestamos();
+    log(`↩️ Devolución: "${libro.titulo}" devuelto por ${est ? est.nombre : p.legajo}`, "info");
+  }
+
+  function calcularMulta() {
+    let dias = parseInt(document.getElementById("m-dias").value);
+    const valor = parseFloat(document.getElementById("m-valor").value);
+
+    if (isNaN(dias) || dias <= 0 || isNaN(valor) || valor <= 0) {
+      log("❌ Error: ingresá días y valor válidos.", "error"); return;
+    }
+
+    const diasEfectivos = Math.min(dias, 30);
+    // Simulación del algoritmo recursivo
+    const multa = diasEfectivos * valor * 0.01;
+
+    document.getElementById("multa-amount").textContent = `$${multa.toFixed(2)}`;
+    document.getElementById("multa-detail").textContent =
+      `${diasEfectivos} días × 1% de $${valor.toFixed(2)} = $${multa.toFixed(2)}${dias > 30 ? " (máximo 30 días aplicado)" : ""}`;
+    document.getElementById("multa-result").classList.add("show");
+    log(`💰 Multa calculada: ${diasEfectivos} días × 1% de $${valor} = $${multa.toFixed(2)}`, dias > 30 ? "error" : "success");
+  }
+
+  // ── INIT ──────────────────────────────────────────────────
+  renderDashboard();
+  log("Sistema listo. Datos de ejemplo cargados.", "success");
+  log(`📚 ${state.libros.length} libros · 🎓 ${state.estudiantes.length} estudiantes`, "info");
+</script>
+</body>
+</html>
